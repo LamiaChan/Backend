@@ -1,8 +1,8 @@
-from rest_framework.serializers             import (HyperlinkedIdentityField, ModelSerializer, SerializerMethodField, ValidationError) 
-from rest_framework                         import serializers 
-from django.utils.text                      import gettext_lazy as _
-from core.models                            import *
-from django.contrib.auth                    import get_user_model
+from rest_framework.serializers import (HyperlinkedIdentityField, ModelSerializer, SerializerMethodField, ValidationError) 
+from rest_framework import serializers 
+from django.utils.text import gettext_lazy as _
+from core.models import *
+from django.contrib.auth import get_user_model
 
 
 User = get_user_model()

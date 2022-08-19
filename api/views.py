@@ -1,18 +1,18 @@
-from rest_framework                 import viewsets
-from rest_framework.response        import Response
-from rest_framework.parsers         import FileUploadParser
-from rest_framework.views           import APIView
-from rest_framework                 import status
-from rest_framework.generics        import CreateAPIView
-from rest_framework.generics        import RetrieveUpdateAPIView
-from .serializers                   import MangaSerializer, ChapterSerializer, PageSerializer, TagSerializer, UserSerializer, ReportSerializer, ShowUserSerializer
-from core.models                    import Manga, Page, Chapter, Tag, Report
-from rest_framework.permissions     import IsAuthenticated, AllowAny, IsAuthenticatedOrReadOnly
-from rest_framework.decorators      import api_view
-from rest_framework.decorators      import permission_classes
-from django.contrib.auth            import get_user_model
-from rest_framework.parsers         import FileUploadParser, FormParser
-from rest_framework.pagination      import PageNumberPagination
+from rest_framework import viewsets
+from rest_framework.response import Response
+from rest_framework.parsers import FileUploadParser
+from rest_framework.views import APIView
+from rest_framework import status
+from rest_framework.generics import CreateAPIView
+from rest_framework.generics import RetrieveUpdateAPIView
+from .serializers import MangaSerializer, ChapterSerializer, PageSerializer, TagSerializer, UserSerializer, ReportSerializer, ShowUserSerializer
+from core.models import Manga, Page, Chapter, Tag, Report
+from rest_framework.permissions import IsAuthenticated, AllowAny, IsAuthenticatedOrReadOnly
+from rest_framework.decorators import api_view
+from rest_framework.decorators import permission_classes
+from django.contrib.auth import get_user_model
+from rest_framework.parsers import FileUploadParser, FormParser
+from rest_framework.pagination import PageNumberPagination
 
  #TODO нужно ограничить добавления манги юзерам без прав или сделать модерацуию
 
@@ -20,7 +20,7 @@ class StandardResultsSetPagination(PageNumberPagination):
     """
     Класс с настройкой пагинации 
     """
-    page_size = 18
+    page_size = 20
     page_size_query_param = 'page_size'
     max_page_size = 1000
 

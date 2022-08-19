@@ -1,16 +1,16 @@
-from __future__                         import unicode_literals
-from django.db                          import models
-from django.urls                        import reverse
-from django.utils                       import timezone
-from django.utils.translation           import ugettext_lazy as _
-from urllib.parse 		                import urlparse
-from datetime                           import datetime
-from django.contrib.auth.models         import User
-from django.core.mail                   import send_mail
-from django.contrib.auth.models         import PermissionsMixin
-from django.contrib.auth.base_user      import AbstractBaseUser
-from .managers                          import UserManager
-from tinymce.models                     import HTMLField
+from __future__ import unicode_literals
+from django.db import models
+from django.urls import reverse
+from django.utils import timezone
+from django.utils.translation import ugettext_lazy as _
+from urllib.parse import urlparse
+from datetime import datetime
+from django.contrib.auth.models import User
+from django.core.mail import send_mail
+from django.contrib.auth.models import PermissionsMixin
+from django.contrib.auth.base_user import AbstractBaseUser
+from .managers import UserManager
+from tinymce.models import HTMLField
 
 class Report(models.Model):
     """

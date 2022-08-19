@@ -56,8 +56,6 @@ INSTALLED_APPS = [
     'corsheaders',
     'django_filters',
     'tinymce',
-    'rest_framework_swagger.apps.RestFrameworkSwaggerConfig'
-
 ]
 
 # модель аунтификации
