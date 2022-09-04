@@ -11,8 +11,11 @@ from django.contrib.auth.models import PermissionsMixin
 from django.contrib.auth.base_user import AbstractBaseUser
 from .managers import UserManager
 from tinymce.models import HTMLField
+from pytils.translit import slugify
+from django_celery_beat.models import PeriodicTask, IntervalSchedule
+import json
 
-class Report(models.Model):
+class NewsItem(models.Model):
     """
     Модель новостей
     """
@@ -33,13 +36,26 @@ class Tag(models.Model):
     def __str__(self):
         return str(self.title)
 
+class ContentType(models.Model):
+    title = models.CharField(max_length=256)
+    
+    def __str__(self):
+        return str(self.title)
+
+class TranslatingStatus(models.Model):
+    title = models.CharField(max_length=256)
+    
+    def __str__(self):
+        return str(self.title)
+
 class Manga(models.Model):
     """
     Модель манги
     """
-    title = models.CharField(max_length=256)
-    url_name = models.CharField(max_length=256, unique=True)
-    # url_name мы используем вместо первичного ключа
+    ru_title = models.CharField(max_length=256)
+    eng_title = models.CharField(max_length=256, blank=True)
+    jp_title = models.CharField(max_length=256, blank=True)
+    slug = models.SlugField(unique=True, blank=True)
     preview_image_url = models.ImageField(upload_to='manga')
     description = models.CharField(max_length=500)
     tags = models.ManyToManyField(Tag)
@@ -49,46 +65,35 @@ class Manga(models.Model):
     # Градиенты должны генерироваться автоматически с фронта при создании манги или ее редактировании
     gradient_color1 = models.CharField(default='empty', max_length=50)
     gradient_color2 = models.CharField(default='empty', max_length=50)
-    
-    OBJECT_TYPES = [
-        ('Манга', 'Манга'),
-        ('Манхва', 'Манхва'),
-        ('Маньхуа', 'Маньхуа'),
-        ('Ранобэ', 'Ранобэ'),
-    ]
+    content_type = models.ManyToManyField(ContentType)
+    translating_status = models.ManyToManyField(TranslatingStatus)
+    loaded_by_parser = models.BooleanField(default=True, editable=False)
+    periodic_task = models.OneToOneField(PeriodicTask, on_delete=models.CASCADE, blank=True)
 
-    NSWF_TYPES = [
-        ('true', 'true'),
-        ('false', 'false'),
-    ]
+    class Meta:
+        verbose_name = 'Comic'
+        verbose_name_plural = 'Comics'
 
-    nswf = models.CharField(
-        max_length = 30,
-        choices = NSWF_TYPES,
-        default = 'false',
-    )
+    def save(self, *args, **kwargs):
+        name = f'{slugify(self.ru_title)} check new chapters'
+        if self.loaded_by_parser:
+            schedule, created = IntervalSchedule.objects.get_or_create(
+                every=10,
+                period=IntervalSchedule.SECONDS,
+            )
 
-    object_type = models.CharField(
-        max_length = 30,
-        choices = OBJECT_TYPES,
-        default = 'Манга',
-    )
-    
-    TRANSLATING_LIST = [
-        ('Ожидает загрузки', 'Ожидает загрузки'),
-        ('Заброшенно', 'Заброшенно'),
-        ('Продолжается', 'Продолжается'),
-        ('Переведено', 'Переведено'),
-    ]
-
-    translating_status = models.CharField(
-        max_length = 30,
-        choices = TRANSLATING_LIST,
-        default = 'Ожидает загрузки',
-    )
+            task = PeriodicTask.objects.create(
+                interval=schedule, 
+                name=name,
+                task='core.tasks.check_new_chapters',
+                args=json.dumps(['arg1', 'arg2'])
+            )
+            self.periodic_task = task
+        self.slug = slugify(self.ru_title)
+        super(Manga, self).save(*args, **kwargs)
 
     def __str__(self):
-        return str(self.title)
+        return str(self.ru_title)
 
 class Chapter(models.Model):
     """
@@ -132,30 +137,9 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(_('is_staff'), default=False)
     user_image = models.ImageField(upload_to='upicks', null=True, blank=True)
     user_big_profile_image = models.ImageField(upload_to='upicks', null=True, blank=True)
-    user_moto = models.CharField(max_length=256, null=True, blank=True)
     user_favorite_manga = models.ManyToManyField(Manga, blank=True, default=None)
     bookmarks = models.ManyToManyField(Page, blank=True, default=None)
     loved_tags = models.ManyToManyField(Tag, blank=True, default=None)
-    #TODO смотреть когда человек зарегался и давать ему тэг или забить
-    RANK_LIST = [
-        ('Новичок', 'Новичок'),
-        ('Завсегдатый', 'Завсегдатый'),
-        ('Боженька', 'Боженька'),
-        ('Модератор', 'Модератор'),
-
-        #Funny
-
-        ('Жидо-скриптизер', 'Жидо-скриптизер'),
-        ('Хозяин-питона', 'Хозяин-питона'),
-        ('Джабист', 'Джабист'),
-        ('Веб хуежник', 'Веб хуежник')
-    ]
-
-    rank = models.CharField(
-        max_length = 30,
-        choices = RANK_LIST,
-        default = 'Новичок',
-    )
 
 
     objects = UserManager()

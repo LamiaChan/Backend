@@ -1,0 +1,1 @@
+python -m celery -A lamia_chan_web beat -l INFO --scheduler django_celery_beat.schedulers:DatabaseScheduler

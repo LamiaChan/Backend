@@ -26,9 +26,6 @@ MEDIA_URL = '/media/'
 CKEDITOR_UPLOAD_PATH = "uploads/"
 DOCKER = bool(environ.get('DOCKER', default=0))
 
-
-
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
@@ -56,6 +53,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'django_filters',
     'tinymce',
+    'django_celery_beat'
 ]
 
 # модель аунтификации
@@ -187,3 +185,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
+
+CELERY_BROKER_URL = "redis://localhost:6379"
+CELERY_RESULT_BACKEND = "redis://localhost:6379"

@@ -5,8 +5,8 @@ from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.generics import CreateAPIView
 from rest_framework.generics import RetrieveUpdateAPIView
-from .serializers import MangaSerializer, ChapterSerializer, PageSerializer, TagSerializer, UserSerializer, ReportSerializer, ShowUserSerializer
-from core.models import Manga, Page, Chapter, Tag, Report
+from .serializers import MangaSerializer, ChapterSerializer, PageSerializer, TagSerializer, UserSerializer, NewsItemSerializer, ShowUserSerializer
+from core.models import Manga, Page, Chapter, Tag, NewsItem
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAuthenticatedOrReadOnly
 from rest_framework.decorators import api_view
 from rest_framework.decorators import permission_classes
@@ -78,7 +78,7 @@ class MangaViewSet(viewsets.ModelViewSet):
     pagination_class = StandardResultsSetPagination
     #queryset = Manga.objects.all().order_by('-likes')
     serializer_class = MangaSerializer
-    lookup_field = 'url_name'
+    lookup_field = 'slug'
 
     def get_queryset(self):
         """
@@ -123,14 +123,14 @@ class MangaViewSet(viewsets.ModelViewSet):
         
         return queryset
 
-class ReportViewSet(viewsets.ModelViewSet):
+class NewsItemViewSet(viewsets.ModelViewSet):
     """
     Класс для вывода новостей
     """
     permission_classes = (IsAuthenticatedOrReadOnly,)
     #pagination_class = StandardResultsSetPagination
-    queryset = Report.objects.all().order_by('-updated')
-    serializer_class = ReportSerializer
+    queryset = NewsItem.objects.all().order_by('-updated')
+    serializer_class = NewsItemSerializer
     #need to refactor
     http_method_names = ['get']
 

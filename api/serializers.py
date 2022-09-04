@@ -18,10 +18,7 @@ class ShowUserSerializer(serializers.ModelSerializer):
             'username', 
             'email', 
             'user_image', 
-            'user_moto', 
             'user_favorite_manga',
-            'bookmarks',
-            'rank'
         ]
 
         read_only_fields  = [
@@ -29,19 +26,17 @@ class ShowUserSerializer(serializers.ModelSerializer):
             'username', 
             'email', 
             'user_image', 
-            'user_moto', 
             'user_favorite_manga',
-            'rank'
         ]
 
 
 
-class ReportSerializer(serializers.ModelSerializer):
+class NewsItemSerializer(serializers.ModelSerializer):
     """
     Cериализатор для вывода новостей
     """
     class Meta:
-        model = Report
+        model = NewsItem
         fields = [
             'id',
             'title',
@@ -130,37 +125,72 @@ class ChapterSerializer(serializers.ModelSerializer):
         """
         page = instance.page_set.all()
         return PageSerializer(page, many=True).data
-        
+
+
+class ContentTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ContentType
+        fields = [
+            'id',
+            'title',
+        ]
+
+class TranslatingStatusSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TranslatingStatus
+        fields = [
+            'id',
+            'title',
+        ]
 
 class MangaSerializer(serializers.ModelSerializer):
     """
     Cериализатор для вывода манги
     """
+    tags_set = serializers.SerializerMethodField()
+    content_type_set = serializers.SerializerMethodField()
+    translating_status_set = serializers.SerializerMethodField()
     chapter_set = serializers.SerializerMethodField()
+
     class Meta:
         model = Manga
         fields = [
             'id', 
-            'title', 
+            'ru_title', 
+            'eng_title',
+            'jp_title',
             'description', 
             'preview_image_url',
-            'tags',
-            'url_name',
+            'tags_set',
+            'slug',
             'year_of_publish',
-            'nswf',
             'likes',
             'updated',
             'gradient_color1',
             'gradient_color2',
+            'content_type_set',
+            'translating_status_set',
             'chapter_set',
 
         ]
         
-        lookup_field = 'url_name'
+        lookup_field = 'slug'
 
         extra_kwargs = {
-            'url': {'lookup_field': 'url_name'}
+            'url': {'lookup_field': 'slug'}
         }
+    
+    def get_tags_set(self, instance):
+        tags = instance.tags.all()
+        return TagSerializer(tags, many=True).data
+
+    def get_content_type_set(self, instance):
+        content_type = instance.content_type.all()
+        return ContentTypeSerializer(content_type, many=True).data
+    
+    def get_translating_status_set(self, instance):
+        translating_status = instance.translating_status.all()
+        return TranslatingStatusSerializer(translating_status, many=True).data
     
     def get_chapter_set(self, instance):
         """
@@ -169,9 +199,6 @@ class MangaSerializer(serializers.ModelSerializer):
         chapter = instance.chapter_set.all()
         return ChapterSerializer(chapter, many=True).data
     
-    
-
-
 class UserSerializer(serializers.ModelSerializer):
     """
     Cериализатор пользователей
@@ -179,7 +206,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     user_favorite_manga = MangaSerializer(many=True, required=False)
     bookmarks = PageSerializer(many=True, required=False)
-
+    loved_tags = TagSerializer(many=True, required=False)
 
     class Meta:
         model = User
@@ -189,10 +216,9 @@ class UserSerializer(serializers.ModelSerializer):
             'email', 
             'password', 
             'user_image', 
-            'user_moto', 
             'user_favorite_manga',
             'bookmarks',
-            'rank',
+            'loved_tags'
         ]
         
         extra_kwargs = {
