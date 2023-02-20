@@ -1,7 +1,7 @@
 import { collections } from "../database.service"
 import { Express, Request, Response } from "express"
 import { ObjectId } from "mongodb"
-import MangaModule from "../modules/manga"
+import MangaModule from "../modules/manga.module"
 
 export function Manga(apiVersion: string, app: Express) {
   app.get(`/api/${apiVersion}/manga`, async (req: Request, res: Response) => {
