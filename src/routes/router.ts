@@ -1,6 +1,6 @@
 import { Manga } from "./manga.router"
 import { Express } from "express"
 
-export function Router(app: Express) {
-  Manga(app)
+export function Router(routerVersion: string, app: Express) {
+  Manga(routerVersion, app)
 }
