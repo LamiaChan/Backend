@@ -1,4 +1,5 @@
 import { ObjectId } from "mongodb";
+import ChapterModule from "./chapter.module";
 
 export default class MangaModule {
   constructor(
@@ -10,9 +11,10 @@ export default class MangaModule {
     public releaseDate: string, 
     public drawer: string, 
     public ageRating: string, 
-    public image: string, 
-    public detailImage: string, 
+    public imageUrl: string, 
+    public detailImageUrl: string, 
     public tags: string[],
+    public chapters: ChapterModule[],
     public id?: ObjectId
   ) {}
 }
